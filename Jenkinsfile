@@ -4,14 +4,19 @@ pipeline {
     stages {
         stage('Clone') {
             steps {
-                // We don't need the URL here anymore because Jenkins 
-                // will already be inside the repo!
                 checkout scm
             }
         }
-        stage('Run Python') {
+        stage('Build Docker Image') {
             steps {
-                sh 'python3 app.py'
+                // This creates a 'package' of your app
+                sh 'docker build -t my-game-app:${BUILD_NUMBER} .'
+            }
+        }
+        stage('Run in Container') {
+            steps {
+                // This runs your app inside its own isolated world
+                sh 'docker run --rm my-game-app:${BUILD_NUMBER}'
             }
         }
     }
